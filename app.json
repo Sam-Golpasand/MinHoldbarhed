@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "scheme": "acme",
+    "newArchEnabled": true,
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "/profile.png",
+          "color": "#000000"
+        }
+      ],
+      "expo-secure-store"
+    ],
+    "name": "Min-Holdbarhed",
+    "slug": "Min-Holdbarhed"
+  }
+}
