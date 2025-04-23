@@ -42,6 +42,7 @@ export default function Scan() {
     language: "en",
   })
   const [quantity, setQuantity] = useState(1)
+  const [isLoading, setIsLoading] = useState(false)
 
   // Effect to run on component mount
   useEffect(() => {
@@ -72,20 +73,24 @@ export default function Scan() {
 
   // Function to fetch user settings
   const fetchUserSettings = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    if (!user) {
-      Alert.alert("Error", "User not logged in")
-      return
-    }
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) {
+        Alert.alert("Error", "User not logged in")
+        return
+      }
 
-    const { data, error } = await supabase.from("user_settings").select("settings").eq("user_id", user.id).single()
+      const { data, error } = await supabase.from("user_settings").select("settings").eq("user_id", user.id).single()
 
-    if (error) {
-      console.error("Error fetching user settings:", error)
-    } else if (data) {
-      setUserSettings(data.settings)
+      if (error) {
+        console.error("Error fetching user settings:", error)
+      } else if (data) {
+        setUserSettings(data.settings)
+      }
+    } catch (error) {
+      console.error("Error in fetchUserSettings:", error)
     }
   }
 
@@ -110,60 +115,101 @@ export default function Scan() {
     }
   }
 
+  // Function to create a product with default values
+  const createDefaultProduct = (barcode) => {
+    return {
+      product_name: "Unknown Product",
+      _keywords: ["unknown", "product", barcode],
+      image_url: null
+    }
+  }
+
   // Function to fetch product data from API
   const fetchProductData = async (barcode) => {
     setScanned(true)
     setBarcodeData(barcode)
+    setIsLoading(true)
 
     try {
-      const https = require("https")
       const response = await axios.get(
         `https://world.openfoodfacts.net/api/v3/product/${barcode}?lc=${userSettings.language}`,
+        { timeout: 10000 } // Add timeout to prevent long waits
       )
-      const productData = response.data.product
-      if (productData && productData._keywords) {
-        const keywords = productData._keywords
-        const productName = productData.product_name || "Unknown Product"
-
-        // Default to 7 days expiration
-        const defaultExpirationDate = new Date()
-        defaultExpirationDate.setDate(defaultExpirationDate.getDate() + 7)
-
-        setProductInfo({
-          product_name: productName,
-          keywords,
-          image_url: productData.image_url,
-        })
-        setExpirationDate(defaultExpirationDate)
-        setModalVisible(true)
-        Animated.spring(modalAnimation, {
-          toValue: 1,
-          useNativeDriver: true,
-        }).start()
-      } else {
-        Alert.alert("Error", "No product or keywords found.")
-      }
+      
+      // Process the product data
+      const productData = response.data.product || createDefaultProduct(barcode)
+      processProductData(productData, barcode)
     } catch (error) {
       console.error("Error fetching product data:", error)
-      Alert.alert("Error", "Failed to retrieve product information.")
+      
+      // Handle 404 errors gracefully
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        // Product not found, create a default product
+        const defaultProduct = createDefaultProduct(barcode)
+        processProductData(defaultProduct, barcode)
+      } else {
+        // Handle other errors
+        Alert.alert(
+          "Product Not Found", 
+          "This product wasn't found in our database. You can still add it manually.",
+          [
+            { text: "Cancel", onPress: () => setScanned(false), style: "cancel" },
+            { text: "Add Manually", onPress: () => processProductData(createDefaultProduct(barcode), barcode) }
+          ]
+        )
+      }
+    } finally {
+      setIsLoading(false)
     }
+  }
+
+  // Function to process product data
+  const processProductData = (productData, barcode) => {
+    // Ensure we have keywords, even if they're default ones
+    const keywords = productData._keywords || ["unknown", "product", barcode]
+    const productName = productData.product_name || "Unknown Product"
+
+    // Default to 7 days expiration
+    const defaultExpirationDate = new Date()
+    defaultExpirationDate.setDate(defaultExpirationDate.getDate() + 7)
+
+    setProductInfo({
+      product_name: productName,
+      keywords,
+      image_url: productData.image_url || null,
+    })
+    setExpirationDate(defaultExpirationDate)
+    setModalVisible(true)
+    Animated.spring(modalAnimation, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start()
   }
 
   // Function to schedule notifications
   const scheduleNotifications = async (productName, expirationDate) => {
     if (!userSettings.notifications.enabled) return
 
-    for (const day of userSettings.notifications.days) {
-      const notificationDate = new Date(expirationDate)
-      notificationDate.setDate(notificationDate.getDate() - day)
-
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "Expiration Reminder",
-          body: `${productName} will expire in ${day} day${day > 1 ? "s" : ""}!`,
-        },
-        trigger: notificationDate,
-      })
+    try {
+      for (const day of userSettings.notifications.days) {
+        const notificationDate = new Date(expirationDate)
+        notificationDate.setDate(notificationDate.getDate() - day)
+        
+        // Check if the date is in the future
+        if (notificationDate > new Date()) {
+          await Notifications.scheduleNotificationAsync({
+            content: {
+              title: "Expiration Reminder",
+              body: `${productName} will expire in ${day} day${day > 1 ? "s" : ""}!`,
+            },
+            trigger: {
+              date: notificationDate, // Use the date property in the trigger object
+            },
+          })
+        }
+      }
+    } catch (error) {
+      console.error("Error scheduling notifications:", error)
     }
   }
 
@@ -174,29 +220,34 @@ export default function Scan() {
       return
     }
 
-    const { data, error } = await supabase.from("grocery_items").insert({
-      user_id: user.id,
-      name:
-        productInfo.product_name === "Unknown Product"
-          ? productInfo.keywords.slice(0, 2).join(" ")
-          : productInfo.product_name,
-      image_url: productInfo.image_url,
-      expiry_date: expirationDate.toISOString(),
-      keywords: productInfo.keywords.slice(0, 5),
-      barcode: barcodeData,
-      quantity: quantity, // Add quantity to the database entry
-    })
+    try {
+      const { data, error } = await supabase.from("grocery_items").insert({
+        user_id: user.id,
+        name:
+          productInfo.product_name === "Unknown Product"
+            ? productInfo.keywords.slice(0, 2).join(" ")
+            : productInfo.product_name,
+        image_url: productInfo.image_url,
+        expiry_date: expirationDate.toISOString(),
+        keywords: productInfo.keywords.slice(0, 5),
+        barcode: barcodeData,
+        quantity: quantity,
+      })
 
-    if (error) {
-      console.error("Error saving item to database:", error)
-      Alert.alert("Error", "Failed to save item to database.")
-    } else {
-      Alert.alert("Success", "Item saved successfully!")
+      if (error) {
+        console.error("Error saving item to database:", error)
+        Alert.alert("Error", "Failed to save item to database.")
+      } else {
+        Alert.alert("Success", "Item saved successfully!")
 
-      // Schedule notifications based on user settings
-      await scheduleNotifications(productInfo.product_name, expirationDate)
+        // Schedule notifications based on user settings
+        await scheduleNotifications(productInfo.product_name, expirationDate)
 
-      closeModal()
+        closeModal()
+      }
+    } catch (error) {
+      console.error("Error in saveItemToDatabase:", error)
+      Alert.alert("Error", "An unexpected error occurred while saving the item.")
     }
   }
 
@@ -470,6 +521,16 @@ export default function Scan() {
           </View>
         </View>
       </Modal>
+
+      {/* Loading indicator */}
+      {isLoading && (
+        <View style={[styles.modalBackground, { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }]} className="flex-1 justify-center items-center">
+          <View className="bg-white p-6 rounded-xl shadow-lg items-center">
+            <Text className="text-lg font-semibold text-gray-800 mb-4">Searching for product...</Text>
+            <View className="h-8 w-8 border-4 border-t-green-500 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin" />
+          </View>
+        </View>
+      )}
 
       <Stack.Screen options={{ headerShown: false }} />
     </View>

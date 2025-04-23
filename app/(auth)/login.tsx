@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useLayoutEffect } from "react"
+import { useState, useLayoutEffect, useRef } from "react"
 import {
   View,
   Text,
@@ -12,6 +12,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   StatusBar,
+  ScrollView,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native"
 import { Link, useRouter } from "expo-router"
 import { supabase } from "../../utils/supabase"
@@ -24,6 +27,9 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const navigation = useNavigation()
+  const scrollViewRef = useRef(null)
+  const emailInputRef = useRef(null)
+  const passwordInputRef = useRef(null)
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -52,99 +58,114 @@ export default function LoginPage() {
     }
   }
 
-  const handleGoogleSignIn = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({ provider: "google" })
-    if (error) {
-      Alert.alert("Error", error.message)
-    } else {
-      router.replace("/home") // Redirect on success
-    }
+  // Function to scroll to the input field when focused
+  const handleFocus = (inputRef) => {
+    // Add a small delay to ensure the keyboard is fully shown
+    setTimeout(() => {
+      if (scrollViewRef.current && inputRef.current) {
+        inputRef.current.measureLayout(
+          scrollViewRef.current,
+          (x, y, width, height) => {
+            scrollViewRef.current.scrollTo({
+              y: y - 100, // Scroll to position with some extra space
+              animated: true,
+            })
+          },
+          () => console.log("Failed to measure")
+        )
+      }
+    }, 100)
   }
 
   return (
     <SafeAreaView className="flex-1 bg-white">
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1">
-        <View className="flex-1 px-8 pt-12">
-
-          {/* Logo and welcome text */}
-          <View className="items-center mt-8 mb-12">
-            <Image source={require("../../public/profile.png")} className="w-20 h-20 mb-4" resizeMode="contain" />
-            <Text className="text-3xl font-bold text-gray-800">Welcome back</Text>
-            <Text className="text-base text-gray-500 mt-2">Sign in to continue</Text>
-          </View>
-
-          {/* Form fields */}
-          <View className="space-y-6">
-            <View>
-              <Text className="text-sm font-medium text-gray-700 mb-2">Email</Text>
-              <View className="flex-row items-center border-b border-gray-300 pb-2">
-                <Mail size={20} color="#6B7280" />
-                <TextInput
-                  className="flex-1 text-base text-gray-700 ml-3"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-              </View>
-            </View>
-
-            <View>
-              <Text className="text-sm font-medium text-gray-700 mb-2">Password</Text>
-              <View className="flex-row items-center border-b border-gray-300 pb-2">
-                <Lock size={20} color="#6B7280" />
-                <TextInput
-                  className="flex-1 text-base text-gray-700 ml-3"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry
-                />
-              </View>
-            </View>
-
-            <TouchableOpacity className="self-end">
-              <Text className="text-sm text-green-600 font-medium">Forgot Password?</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Login button */}
-          <TouchableOpacity
-            className={`bg-green-600 py-4 rounded-xl mt-10 ${loading ? "opacity-70" : ""}`}
-            onPress={handleLogin}
-            disabled={loading}
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === "ios" ? "padding" : "height"} 
+        className="flex-1"
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ScrollView 
+            ref={scrollViewRef}
+            contentContainerStyle={{ flexGrow: 1 }}
+            keyboardShouldPersistTaps="handled"
           >
-            <Text className="text-white text-center font-bold text-lg">{loading ? "Signing in..." : "Sign In"}</Text>
-          </TouchableOpacity>
+            <View className="flex-1 px-8 pt-12 pb-8">
+              {/* Logo and welcome text */}
+              <View className="items-center mt-8 mb-12">
+                <Image source={require("../../public/profile.png")} className="w-40 h-40 rounded-lg mb-4" resizeMode="contain" />
+                <Text className="text-3xl font-bold text-gray-800">Welcome back</Text>
+                <Text className="text-base text-gray-500 mt-2">Sign in to continue</Text>
+              </View>
 
-          {/* Divider */}
-          <View className="flex-row items-center my-8">
-            <View className="flex-1 h-px bg-gray-300" />
-            <Text className="mx-4 text-gray-500">or continue with</Text>
-            <View className="flex-1 h-px bg-gray-300" />
-          </View>
+              {/* Form fields */}
+              <View className="space-y-6">
+                <View>
+                  <Text className="text-sm font-medium text-gray-700 mb-2">Email</Text>
+                  <View className="flex-row items-center border-b border-gray-300 pb-2">
+                    <Mail size={20} color="#6B7280" />
+                    <TextInput
+                      ref={emailInputRef}
+                      className="flex-1 text-base text-gray-700 ml-3"
+                      placeholder="Enter your email"
+                      value={email}
+                      onChangeText={setEmail}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      onFocus={() => handleFocus(emailInputRef)}
+                      returnKeyType="next"
+                      onSubmitEditing={() => passwordInputRef.current?.focus()}
+                    />
+                  </View>
+                </View>
 
-          {/* Google sign in */}
-          <TouchableOpacity
-            className="bg-white border border-gray-300 py-4 rounded-xl flex-row justify-center items-center"
-            onPress={handleGoogleSignIn}
-          >
-            <Image source={require("../../public/google-logo.png")} className="w-5 h-5 mr-3" resizeMode="contain" />
-            <Text className="text-gray-700 font-semibold text-base">Sign in with Google</Text>
-          </TouchableOpacity>
+                <View>
+                  <Text className="text-sm font-medium text-gray-700 mb-2">Password</Text>
+                  <View className="flex-row items-center border-b border-gray-300 pb-2">
+                    <Lock size={20} color="#6B7280" />
+                    <TextInput
+                      ref={passwordInputRef}
+                      className="flex-1 text-base text-gray-700 ml-3"
+                      placeholder="Enter your password"
+                      value={password}
+                      onChangeText={setPassword}
+                      secureTextEntry
+                      onFocus={() => handleFocus(passwordInputRef)}
+                      returnKeyType="done"
+                      onSubmitEditing={handleLogin}
+                    />
+                  </View>
+                </View>
 
-          {/* Register link */}
-          <View className="flex-row justify-center mt-10 mb-6">
-            <Text className="text-gray-600">Don't have an account? </Text>
-            <Link href="/register" asChild>
-              <TouchableOpacity>
-                <Text className="text-green-600 font-bold">Register</Text>
+                <TouchableOpacity className="self-end">
+                  <Text className="text-sm text-green-600 font-medium">Forgot Password?</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Login button */}
+              <TouchableOpacity
+                className={`bg-green-600 py-4 rounded-xl mt-10 ${loading ? "opacity-70" : ""}`}
+                onPress={handleLogin}
+                disabled={loading}
+              >
+                <Text className="text-white text-center font-bold text-lg">
+                  {loading ? "Signing in..." : "Sign In"}
+                </Text>
               </TouchableOpacity>
-            </Link>
-          </View>
-        </View>
+
+              {/* Register link */}
+              <View className="flex-row justify-center mt-10 mb-6">
+                <Text className="text-gray-600">Don't have an account? </Text>
+                <Link href="/register" asChild>
+                  <TouchableOpacity>
+                    <Text className="text-green-600 font-bold">Register</Text>
+                  </TouchableOpacity>
+                </Link>
+              </View>
+            </View>
+          </ScrollView>
+        </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>
   )
