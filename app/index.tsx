@@ -11,6 +11,7 @@ export default function App() {
     checkUser();
   }, []);
 
+  
   async function checkUser() {
     try {
       // First check if we have a session
@@ -43,6 +44,5 @@ export default function App() {
     return <Loading />; 
   }
 
-  // Simplified redirect logic
   return authenticated ? <Redirect href="/home" /> : <Redirect href="/login" />;
 }

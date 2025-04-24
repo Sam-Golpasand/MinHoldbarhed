@@ -271,6 +271,8 @@ export default function Scan() {
     })
   }
 
+
+
   // Render loading state
   if (!permission) {
     return <View />

@@ -47,7 +47,6 @@ export default function RegisterPage() {
 
     setLoading(true)
     try {
-      // Step 1: Sign up the user with Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: email,
         password: password,
@@ -61,7 +60,6 @@ export default function RegisterPage() {
       if (authError) throw authError;
       
       if (authData.user) {
-        // Step 2: Create a profile in the profiles table
         const { error: profileError } = await supabase
           .from('profiles')
           .insert({
@@ -74,8 +72,7 @@ export default function RegisterPage() {
           console.error("Error creating profile:", profileError);
           // Continue with registration even if profile creation fails
         }
-        
-        // Step 3: Create default settings for the user
+      
         const defaultSettings = {
           notifications: { enabled: true, days: [1, 3] },
         };
@@ -89,15 +86,14 @@ export default function RegisterPage() {
           
         if (settingsError) {
           console.error("Error creating settings:", settingsError);
-          // Continue with registration even if settings creation fails
         }
       }
 
-      /*Alert.alert(
+      Alert.alert(
         "Registration Successful", 
-        "Please check your email to verify your account.", 
+        "Log in now", 
         [{ text: "OK", onPress: () => router.replace("/login") }]
-      ); */
+      ); 
       
     } catch (error) {
       console.error("Registration error:", error);
