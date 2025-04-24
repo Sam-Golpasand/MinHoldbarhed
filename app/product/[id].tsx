@@ -78,7 +78,7 @@ export default function ProductDetails() {
               console.error("Error deleting item:", error)
               Alert.alert("Error", "Failed to delete item. Please try again.")
             } else {
-              Alert.alert("Success", "Item deleted successfully.")
+              //Alert.alert("Success", "Item deleted successfully.")
               router.back()
             }
           } catch (error) {

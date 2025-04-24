@@ -16,11 +16,14 @@ export default function Home() {
 
   const fetchGroceryItems = useCallback(async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser()
+
       const { data, error } = await supabase
         .from("grocery_items")
         .select("*")
         .gt("expiry_date", new Date().toISOString())
         .order("expiry_date", { ascending: true })
+        .eq("user_id", user.id)
 
       if (error) {
         throw error
@@ -91,8 +94,6 @@ export default function Home() {
         if (error) {
           throw error
         }
-
-        Alert.alert("Success", "Item deleted successfully.")
         fetchGroceryItems()
       } catch (error) {
         console.error("Error deleting item:", error)
@@ -116,7 +117,7 @@ export default function Home() {
 
       {/* Grocery Items List */}
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-        <View className="p-4">
+        <View className="p-4 mb-16">
           {filteredItems.length === 0 ? (
             <Text className="text-center text-gray-500 mt-8">No items match your search. Try another query!</Text>
           ) : (

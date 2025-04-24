@@ -118,7 +118,7 @@ export default function SettingsScreen() {
         Alert.alert('Error', 'Failed to save user settings.');
       } else {
         setSettings(newSettings);
-        Alert.alert('Success', 'Settings saved successfully.');
+        //Alert.alert('Success', 'Settings saved successfully.');
       }
     } catch (error) {
       console.error('Unexpected error in saveUserSettings:', error);

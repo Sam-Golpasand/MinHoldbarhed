@@ -186,7 +186,7 @@ export default function Scan() {
     }).start()
   }
 
-  // Function to schedule notifications
+// Function to schedule notifications
   const scheduleNotifications = async (productName, expirationDate) => {
     if (!userSettings.notifications.enabled) return
 
@@ -203,7 +203,8 @@ export default function Scan() {
               body: `${productName} will expire in ${day} day${day > 1 ? "s" : ""}!`,
             },
             trigger: {
-              date: notificationDate, // Use the date property in the trigger object
+              date: notificationDate,
+              type: Notifications.SchedulableTriggerInputTypes.DATE,
             },
           })
         }
@@ -238,7 +239,7 @@ export default function Scan() {
         console.error("Error saving item to database:", error)
         Alert.alert("Error", "Failed to save item to database.")
       } else {
-        Alert.alert("Success", "Item saved successfully!")
+        //Alert.alert("Success", "Item saved successfully!")
 
         // Schedule notifications based on user settings
         await scheduleNotifications(productInfo.product_name, expirationDate)
@@ -468,7 +469,7 @@ export default function Scan() {
                   onPress={saveItemToDatabase}
                 >
                   <Ionicons name="scan-outline" size={20} color="#22c55e" className="mr-2" />
-                  <Text className="text-green-600 font-semibold text-base ml-2">Save & Scan More</Text>
+                  <Text className="text-green-600 font-semibold text-base ml-2">Save & Scan Again</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -476,6 +477,7 @@ export default function Scan() {
                   onPress={() => {
                     saveItemToDatabase()
                     closeModal()
+                    router.push("/home")
                   }}
                 >
                   <Ionicons name="checkmark-circle-outline" size={20} color="#fff" className="mr-2" />

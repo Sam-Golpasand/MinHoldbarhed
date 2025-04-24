@@ -93,11 +93,11 @@ export default function RegisterPage() {
         }
       }
 
-      Alert.alert(
+      /*Alert.alert(
         "Registration Successful", 
         "Please check your email to verify your account.", 
         [{ text: "OK", onPress: () => router.replace("/login") }]
-      );
+      ); */
       
     } catch (error) {
       console.error("Registration error:", error);
