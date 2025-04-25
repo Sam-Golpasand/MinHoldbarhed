@@ -290,7 +290,6 @@ export default function Scan() {
     )
   }
 
-  // Main component render
   return (
     <View className="flex-1 justify-center">
       <CameraView
@@ -378,9 +377,7 @@ export default function Scan() {
               </TouchableOpacity>
             </View>
 
-            {/* Two-column layout */}
             <View className="flex-row mb-5">
-              {/* Left column - Product Image */}
               <View className="w-1/3 mr-4 items-center justify-start">
                 {productInfo.image_url ? (
                   <View className="bg-white rounded-xl overflow-hidden shadow-sm w-full aspect-square border border-gray-200">
@@ -422,9 +419,7 @@ export default function Scan() {
                 </View>
               </View>
 
-              {/* Right column - Product Details */}
               <View className="flex-1">
-                {/* Keywords Section */}
                 <View className="mb-4">
                   <Text className="text-base font-semibold text-gray-700 mb-2">Keywords:</Text>
                   <View className="flex-row flex-wrap">
@@ -456,7 +451,6 @@ export default function Scan() {
                   </TouchableOpacity>
                 </View>
 
-                {/* DateTimePicker Component */}
                 {showDatePicker && (
                   <DateTimePicker value={expirationDate} mode="date" display="default" onChange={onDateChange} />
                 )}
@@ -500,10 +494,8 @@ export default function Scan() {
       >
         <View style={styles.modalBackground} className="flex-1 justify-center items-center">
           <View className="bg-white p-6 rounded-xl w-80 shadow-lg">
-            {/* Modal Title */}
             <Text className="text-2xl font-bold text-gray-800 mb-4 text-center">Enter Barcode</Text>
 
-            {/* Barcode Input */}
             <TextInput
               className="border border-gray-300 rounded-lg px-3 py-2 mb-4 text-lg"
               placeholder="Enter barcode number"
@@ -526,7 +518,6 @@ export default function Scan() {
         </View>
       </Modal>
 
-      {/* Loading indicator */}
       {isLoading && (
         <View style={[styles.modalBackground, { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }]} className="flex-1 justify-center items-center">
           <View className="bg-white p-6 rounded-xl shadow-lg items-center">

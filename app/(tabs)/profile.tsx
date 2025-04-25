@@ -31,13 +31,11 @@ export default function ProfilePage() {
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("email", authUser.email)  // Use email instead of ID
+        .eq("email", authUser.email) 
         .single();
 
       if (error) {
         console.error("Error fetching profile:", error);
-        // Don't show an alert for this specific error, just log it
-        // The user can still use the app with basic auth info
       } else if (data) {
         setProfile(data);
       }
@@ -129,7 +127,6 @@ export default function ProfilePage() {
           </View>
         </View>
 
-        {/* Actions */}
         <View className="bg-white p-6 rounded-xl shadow-sm mb-6">
           <Text className="text-lg font-bold text-gray-800 mb-4">Account</Text>
           

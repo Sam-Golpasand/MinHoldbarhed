@@ -40,12 +40,11 @@ export default function SettingsScreen() {
     
       if (error) {
         if (error.code === 'PGRST116') { // No settings found
-          // Create default settings
+          // default settings
           const defaultSettings = {
             notifications: { enabled: true, days: [1, 3] },
           };
           
-          // Save default settings with the UUID
           const { error: saveError } = await supabase
             .from('user_settings')
             .insert({ 
@@ -57,7 +56,6 @@ export default function SettingsScreen() {
             console.error('Error saving default settings:', saveError);
             Alert.alert('Error', 'Failed to initialize user settings.');
           } else {
-            // Successfully saved defaults
             setSettings(defaultSettings);
           }
         } else {
@@ -65,7 +63,6 @@ export default function SettingsScreen() {
           Alert.alert('Error', 'Failed to load user settings.');
         }
       } else if (data && data.settings) {
-        // Successfully retrieved existing settings
         setSettings(data.settings);
       }
     } catch (error) {
@@ -86,7 +83,6 @@ export default function SettingsScreen() {
         return;
       }
     
-      // First check if settings exist for this user
       const { data, error: checkError } = await supabase
         .from('user_settings')
         .select('id')
@@ -96,7 +92,7 @@ export default function SettingsScreen() {
       let saveError;
       
       if (checkError && checkError.code === 'PGRST116') {
-        // No settings exist, so insert
+        // No settings exist so insert
         const { error } = await supabase
           .from('user_settings')
           .insert({ 
@@ -105,7 +101,7 @@ export default function SettingsScreen() {
           });
         saveError = error;
       } else {
-        // Settings exist, so update
+        // Settings exist so update
         const { error } = await supabase
           .from('user_settings')
           .update({ settings: newSettings })
@@ -118,7 +114,6 @@ export default function SettingsScreen() {
         Alert.alert('Error', 'Failed to save user settings.');
       } else {
         setSettings(newSettings);
-        //Alert.alert('Success', 'Settings saved successfully.');
       }
     } catch (error) {
       console.error('Unexpected error in saveUserSettings:', error);
@@ -192,7 +187,6 @@ export default function SettingsScreen() {
         <View className="px-6 py-8">
           <Text className="text-2xl font-bold mb-6 text-gray-800">Settings</Text>
           
-          {/* Notifications Section */}
           <View className="bg-white p-6 rounded-xl shadow-sm mb-6">
             <View className="flex-row items-center mb-4">
               <Text className="text-lg font-bold text-gray-800">Notifications</Text>

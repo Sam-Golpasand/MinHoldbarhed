@@ -63,14 +63,13 @@ export default function RegisterPage() {
         const { error: profileError } = await supabase
           .from('profiles')
           .insert({
-            user_id: authData.user.id,  // Use the UUID from auth
+            user_id: authData.user.id, 
             email: email,
             username: name,
           });
           
         if (profileError) {
           console.error("Error creating profile:", profileError);
-          // Continue with registration even if profile creation fails
         }
       
         const defaultSettings = {
@@ -112,7 +111,7 @@ export default function RegisterPage() {
           scrollViewRef.current,
           (x, y, width, height) => {
             scrollViewRef.current.scrollTo({
-              y: y - 100, // Scroll to position with some extra space
+              y: y - 100, 
               animated: true,
             })
           },
@@ -137,7 +136,6 @@ export default function RegisterPage() {
             keyboardShouldPersistTaps="handled"
           >
             <View className="flex-1 px-8 pt-12 pb-8">
-              {/* Logo and welcome text */}
               <View className="items-center mt-8 mb-12">
                 <Image source={require("../../public/profile.png")} className="w-20 h-20 mb-4" resizeMode="contain" />
                 <Text className="text-3xl font-bold text-gray-800">Create Account</Text>

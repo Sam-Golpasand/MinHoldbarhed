@@ -11,7 +11,7 @@ const LogoutScreen = ({ navigation }) => {
     const signOut = async () => {
       const { error } = await supabase.auth.signOut();
       if (!error) {
-        router.replace('/login'); // Navigate to the login screen after logout
+        router.replace('/login'); 
       } else {
         console.error('Error signing out:', error.message);
       }

@@ -31,7 +31,7 @@ export default function Home() {
 
       console.log("Fetched grocery items:", data)
       setGroceryItems(data)
-      setFilteredItems(data) // Initially display all items
+      setFilteredItems(data) 
     } catch (error) {
       console.error("Error fetching grocery items:", error)
       Alert.alert("Error", "Failed to fetch grocery items. Please try again.")
@@ -136,7 +136,7 @@ export default function Home() {
         </View>
       </ScrollView>
 
-      {/* Scan Button - Enhanced to work with tab bar */}
+      {/* Scan Button */}
       <View className="absolute bottom-24 right-8 z-10">
         <TouchableOpacity
           className="w-16 h-16 rounded-full bg-green-600 justify-center items-center shadow-xl"

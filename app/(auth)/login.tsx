@@ -67,7 +67,7 @@ export default function LoginPage() {
           scrollViewRef.current,
           (x, y, width, height) => {
             scrollViewRef.current.scrollTo({
-              y: y - 100, // Scroll to position with some extra space
+              y: y - 100, 
               animated: true,
             })
           },
@@ -92,14 +92,12 @@ export default function LoginPage() {
             keyboardShouldPersistTaps="handled"
           >
             <View className="flex-1 px-8 pt-12 pb-8">
-              {/* Logo and welcome text */}
               <View className="items-center mt-8 mb-12">
                 <Image source={require("../../public/profile.png")} className="w-40 h-40 rounded-lg mb-4" resizeMode="contain" />
                 <Text className="text-3xl font-bold text-gray-800">Welcome back</Text>
                 <Text className="text-base text-gray-500 mt-2">Sign in to continue</Text>
               </View>
 
-              {/* Form fields */}
               <View className="space-y-6">
                 <View>
                   <Text className="text-sm font-medium text-gray-700 mb-2">Email</Text>
@@ -142,8 +140,6 @@ export default function LoginPage() {
                   <Text className="text-sm text-green-600 font-medium">Forgot Password?</Text>
                 </TouchableOpacity>
               </View>
-
-              {/* Login button */}
               <TouchableOpacity
                 className={`bg-green-600 py-4 rounded-xl mt-10 ${loading ? "opacity-70" : ""}`}
                 onPress={handleLogin}
@@ -154,7 +150,6 @@ export default function LoginPage() {
                 </Text>
               </TouchableOpacity>
 
-              {/* Register link */}
               <View className="flex-row justify-center mt-10 mb-6">
                 <Text className="text-gray-600">Don't have an account? </Text>
                 <Link href="/register" asChild>
