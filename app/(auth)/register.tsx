@@ -87,6 +87,9 @@ export default function RegisterPage() {
           console.error("Error creating settings:", settingsError);
         }
       }
+      
+      // Step 4: Navigate to the login page
+      router.replace("/login")
 
       Alert.alert(
         "Registration Successful", 

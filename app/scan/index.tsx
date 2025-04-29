@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { View, Text, TouchableOpacity, Modal, Animated, Alert, TextInput, Image, StyleSheet } from "react-native"
 import { CameraView, useCameraPermissions } from "expo-camera"
 
-import { router, Stack } from "expo-router"
+import { router, Stack, useLocalSearchParams } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
 import axios from "axios"
 import DateTimePicker from "@react-native-community/datetimepicker"
@@ -43,6 +43,7 @@ export default function Scan() {
   })
   const [quantity, setQuantity] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
+  const {fridge_id} = useLocalSearchParams()
 
   // Effect to run on component mount
   useEffect(() => {
@@ -224,6 +225,8 @@ export default function Scan() {
     try {
       const { data, error } = await supabase.from("grocery_items").insert({
         user_id: user.id,
+        //added fridge_id
+        fridge_id: fridge_id,
         name:
           productInfo.product_name === "Unknown Product"
             ? productInfo.keywords.slice(0, 2).join(" ")
