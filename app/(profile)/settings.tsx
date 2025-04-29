@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, Switch, Act
 import { Stack, useRouter } from 'expo-router';
 import { Trash2, Plus, AlertCircle } from 'lucide-react-native';
 import { supabase } from '../../utils/supabase';
+import { Fridges } from './Fridges';
 
 export default function SettingsScreen() {
   const [settings, setSettings] = useState({
@@ -252,6 +253,7 @@ export default function SettingsScreen() {
               </View>
             </View>
           </View>
+          <Fridges  />
         </View>
       </ScrollView>
       <Stack.Screen 
