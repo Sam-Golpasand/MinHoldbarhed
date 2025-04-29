@@ -225,6 +225,7 @@ export default function Scan() {
     try {
       const { data, error } = await supabase.from("grocery_items").insert({
         user_id: user.id,
+        //added fridge_id
         fridge_id: fridge_id,
         name:
           productInfo.product_name === "Unknown Product"

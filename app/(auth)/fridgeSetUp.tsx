@@ -2,8 +2,9 @@ import { Redirect, useRouter } from "expo-router";
 import { supabase } from '../../utils/supabase';
 import { useEffect, useState } from "react";
 import Loading from "../components/Loading";
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, Switch, ActivityIndicator } from 'react-native';
+import {Alert} from 'react-native';
 
+//intermediate side to check weather user has a fridge
 export default function FridgeSetUp() {
   const [loading, setLoading] = useState(true);
   const [hasFridge, setHasFridge] = useState(false);
@@ -31,6 +32,7 @@ export default function FridgeSetUp() {
       if (error) {
         console.error("Error fetching user fridges:", error);
       }
+      //if there are fridges
       if (fridgeLinks && fridgeLinks.length > 0) {
         setHasFridge(true);
       }

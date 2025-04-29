@@ -12,7 +12,7 @@ import {
 import { supabase } from "../../utils/supabase"
 import { useRouter } from "expo-router"
 
-
+//Fridge settings
 export function Fridges() {
   const [loading, setLoading] = useState(false)
   const [fridgeList, setFridgeList] = useState([]);
@@ -31,6 +31,8 @@ export function Fridges() {
   useEffect(() => {
     fetchFridges()
   }, [])
+
+
 
   async function fetchFridges() {
     setLoading(true)
@@ -62,6 +64,7 @@ export function Fridges() {
     }
   }
 
+  // generate share code for new fridges
   function generateShareCode(length = 6) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let code = '';
@@ -260,7 +263,6 @@ function FridgeModule({ name, isLast, code }: { name: string; isLast: boolean, c
         <Text className="text-gray-700 ml-auto">code: </Text>
         <Text className="text-gray-700 ml-auto" >{ showCode ? code : "******"}</Text>
       </View>
-      
     </TouchableOpacity>
   )
 }

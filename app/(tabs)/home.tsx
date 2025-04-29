@@ -156,7 +156,7 @@ export default function Home() {
       {/* Search Bar */}
       <View className="p-4 bg-white shadow-md">
         <View className="flex-row items-center border border-gray-300 rounded-lg overflow-hidden bg-white">
-          {/* Dropdown (left third) */}
+          {/* Fridge-Dropdown */}
           <TouchableOpacity
             onPress={() => setDropdownVisible(true)}
             className="w-1/3 px-3 py-2 border-r border-gray-300 bg-white flex-row items-center justify-between"
@@ -167,7 +167,7 @@ export default function Home() {
             <Ionicons name="chevron-down" className="" size={16} color="#6B7280" />
           </TouchableOpacity>
 
-          {/* Search Input (right two-thirds) */}
+          {/* Search Input */}
           <TextInput
             className="flex-1 px-4 py-2 text-lg bg-white"
             placeholder="Search items..."
@@ -176,7 +176,7 @@ export default function Home() {
           />
         </View>
 
-        {/* Dropdown Modal */}
+        {/* Fridge-Dropdown Modal */}
         <Modal transparent visible={dropdownVisible} animationType="fade">
           <TouchableOpacity
             className="flex-1 justify-center items-center bg-black/30 px-8"
@@ -207,7 +207,7 @@ export default function Home() {
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         <View className="p-4 mb-16">
           {filteredItems.length === 0 ? (
-            <Text className="text-center text-gray-500 mt-8">No items match your search. Try another query!</Text>
+            <Text className="text-center text-gray-500 mt-8">Try another query or switch fridge!</Text>
           ) : (
             filteredItems.map((item) => (
               <GroceryItemCard

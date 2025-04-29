@@ -17,6 +17,7 @@ import { useRouter } from 'expo-router';
 import { supabase } from '../../utils/supabase';
 import { useNavigation } from "@react-navigation/native"
 
+// One time page create first fridge
 export default function CreateFridge() {
   const navigation = useNavigation()
   const [fridgeName, setFridgeName] = useState('');
@@ -33,6 +34,7 @@ export default function CreateFridge() {
 
   async function handleCreateFridge() {
 
+    //generate ramdom share code
     function generateShareCode(length = 6) {
       const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
       let code = '';
@@ -133,7 +135,7 @@ export default function CreateFridge() {
               {/* Header */}
               <View className="items-center mb-12 mt-20">
                 <Text className="text-3xl font-bold text-gray-800">Welcome</Text>
-                <Text className="text-base text-gray-500 mt-2">Create your first Fridge</Text>
+                <Text className="text-base text-gray-500 mt-2">Create your first fridge</Text>
               </View>
 
               {/* Input field */}
@@ -167,7 +169,7 @@ export default function CreateFridge() {
               {/* OR Separator */}
               <View className="flex-row items-center mb-4 mt-10">
                 <View className="flex-1 h-px bg-gray-300" />
-                <Text className="mx-4 text-gray-500 font-medium">Or join by Fridge Code</Text>
+                <Text className="mx-4 text-gray-500 font-medium">Or join by fridge code</Text>
                 <View className="flex-1 h-px bg-gray-300" />
               </View>
 

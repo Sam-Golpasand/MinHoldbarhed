@@ -46,7 +46,6 @@ export default function RegisterPage() {
     }
 
     setLoading(true)
-    console.log("hello")
     try {
       // Step 1: Sign up the user with Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -93,6 +92,9 @@ export default function RegisterPage() {
           // Continue with registration even if settings creation fails
         }
       }
+      
+      // Step 4: Navigate to the login page
+      router.replace("/login")
 
       /*Alert.alert(
         "Registration Successful", 
