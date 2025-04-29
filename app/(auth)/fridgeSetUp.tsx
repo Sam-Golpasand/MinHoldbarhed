@@ -24,7 +24,7 @@ export default function FridgeSetUp() {
     
       // First try to get existing fridges
       const { data: fridgeLinks, error } = await supabase
-        .from('user_fridges')
+        .from('user_fridge')
         .select('fridges(*)')
         .eq('user_id', user.id);
       
