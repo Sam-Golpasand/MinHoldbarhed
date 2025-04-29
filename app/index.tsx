@@ -13,6 +13,7 @@ export default function App() {
 
   async function checkUser() {
     try {
+      await supabase.auth.signOut();
       // First check if we have a session
       const { data: sessionData } = await supabase.auth.getSession();
       
@@ -44,5 +45,5 @@ export default function App() {
   }
 
   // Simplified redirect logic
-  return authenticated ? <Redirect href="/home" /> : <Redirect href="/login" />;
+  return authenticated ? <Redirect href="/fridgeSetUp" /> : <Redirect href="/login" />;
 }

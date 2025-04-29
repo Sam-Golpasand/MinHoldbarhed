@@ -54,7 +54,7 @@ export default function LoginPage() {
     if (error) {
       Alert.alert("Error", error.message)
     } else {
-      router.replace("/home")
+      router.replace("/fridgeSetUp")
     }
   }
 

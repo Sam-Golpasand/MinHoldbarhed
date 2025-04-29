@@ -46,6 +46,7 @@ export default function RegisterPage() {
     }
 
     setLoading(true)
+    console.log("hello")
     try {
       // Step 1: Sign up the user with Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
