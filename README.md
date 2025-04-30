@@ -52,6 +52,12 @@ Install dependencies by running:
 npm install
 ```
 
+Fill out .env (copy .env.example)
+
+```bash
+cp .env.example .env 
+```
+
 ## Usage
 
 Run the project locally:
