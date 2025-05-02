@@ -463,15 +463,7 @@ export default function Scan() {
             {/* Buttons Section */}
             <View className="mt-4 border-t border-gray-200 pt-4">
               <View className="flex-row justify-between space-x-3">
-                <TouchableOpacity
-                  className="flex-1 bg-white border-2 border-green-500 rounded-xl py-3 px-4 flex-row items-center justify-center"
-                  onPress={saveItemToDatabase}
-                >
-                  <Ionicons name="scan-outline" size={20} color="#22c55e" className="mr-2" />
-                  <Text className="text-green-600 font-semibold text-base ml-2">Save & Scan Again</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
+              <TouchableOpacity
                   className="flex-1 bg-green-500 rounded-xl py-3 px-4 flex-row items-center justify-center"
                   onPress={() => {
                     saveItemToDatabase()
@@ -481,6 +473,13 @@ export default function Scan() {
                 >
                   <Ionicons name="checkmark-circle-outline" size={20} color="#fff" className="mr-2" />
                   <Text className="text-white font-semibold text-base ml-2">Save & Finish</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  className="flex-1 bg-white border-2 border-green-500 rounded-xl py-3 px-4 flex-row items-center justify-center"
+                  onPress={saveItemToDatabase}
+                >
+                  <Ionicons name="scan-outline" size={20} color="#22c55e" className="mr-2" />
+                  <Text className="text-green-600 font-semibold text-base ml-2">Save & Scan Again</Text>
                 </TouchableOpacity>
               </View>
             </View>
