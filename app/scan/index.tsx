@@ -43,7 +43,7 @@ export default function Scan() {
   })
   const [quantity, setQuantity] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
-  const {fridge_id} = useLocalSearchParams()
+  const { fridge_id } = useLocalSearchParams()
 
   // Effect to run on component mount
   useEffect(() => {
@@ -121,7 +121,7 @@ export default function Scan() {
     return {
       product_name: "Unknown Product",
       _keywords: ["unknown", "product", barcode],
-      image_url: null
+      image_url: null,
     }
   }
 
@@ -134,30 +134,24 @@ export default function Scan() {
     try {
       const response = await axios.get(
         `https://world.openfoodfacts.net/api/v3/product/${barcode}?lc=${userSettings.language}`,
-        { timeout: 10000 } // Add timeout to prevent long waits
+        { timeout: 10000 }, // Add timeout to prevent long waits
       )
-      
+
       // Process the product data
       const productData = response.data.product || createDefaultProduct(barcode)
       processProductData(productData, barcode)
     } catch (error) {
       console.error("Error fetching product data:", error)
-      
-      // Handle 404 errors gracefully
+
+      // Handle 404 errors with a simple alert
       if (axios.isAxiosError(error) && error.response?.status === 404) {
-        // Product not found, create a default product
-        const defaultProduct = createDefaultProduct(barcode)
-        processProductData(defaultProduct, barcode)
+        Alert.alert("Product Not Found", "This product wasn't found in our database. Sorry!")
+        setScanned(false)
       } else {
         // Handle other errors
-        Alert.alert(
-          "Product Not Found", 
-          "This product wasn't found in our database. You can still add it manually.",
-          [
-            { text: "Cancel", onPress: () => setScanned(false), style: "cancel" },
-            { text: "Add Manually", onPress: () => processProductData(createDefaultProduct(barcode), barcode) }
-          ]
-        )
+        Alert.alert("Error", "There was a problem fetching product information.", [
+          { text: "OK", onPress: () => setScanned(false), style: "cancel" },
+        ])
       }
     } finally {
       setIsLoading(false)
@@ -168,7 +162,7 @@ export default function Scan() {
   const processProductData = (productData, barcode) => {
     // Ensure we have keywords, even if they're default ones
     const keywords = productData._keywords || ["unknown", "product", barcode]
-    const productName = productData.product_name || "Unknown Product"
+    const productName = productData.product_name
 
     // Default to 7 days expiration
     const defaultExpirationDate = new Date()
@@ -180,14 +174,20 @@ export default function Scan() {
       image_url: productData.image_url || null,
     })
     setExpirationDate(defaultExpirationDate)
-    setModalVisible(true)
-    Animated.spring(modalAnimation, {
-      toValue: 1,
-      useNativeDriver: true,
-    }).start()
+    if (!productData.product_name) {
+      Alert.alert("Error", "Can't find item.")
+      setScanned(false)
+      return
+    } else {
+      setModalVisible(true)
+      Animated.spring(modalAnimation, {
+        toValue: 1,
+        useNativeDriver: true,
+      }).start()
+    }
   }
 
-// Function to schedule notifications
+  // Function to schedule notifications
   const scheduleNotifications = async (productName, expirationDate) => {
     if (!userSettings.notifications.enabled) return
 
@@ -195,7 +195,7 @@ export default function Scan() {
       for (const day of userSettings.notifications.days) {
         const notificationDate = new Date(expirationDate)
         notificationDate.setDate(notificationDate.getDate() - day)
-        
+
         // Check if the date is in the future
         if (notificationDate > new Date()) {
           await Notifications.scheduleNotificationAsync({
@@ -219,6 +219,12 @@ export default function Scan() {
   const saveItemToDatabase = async () => {
     if (!user) {
       Alert.alert("Error", "You must be logged in to save items.")
+      return
+    }
+
+    if (!productInfo.product_name || productInfo.product_name === "") {
+      Alert.alert("Error", "Can't find item.")
+      closeModal()
       return
     }
 
@@ -273,8 +279,6 @@ export default function Scan() {
       setScanned(false)
     })
   }
-
-
 
   // Render loading state
   if (!permission) {
@@ -463,7 +467,7 @@ export default function Scan() {
             {/* Buttons Section */}
             <View className="mt-4 border-t border-gray-200 pt-4">
               <View className="flex-row justify-between space-x-3">
-              <TouchableOpacity
+                <TouchableOpacity
                   className="flex-1 bg-green-500 rounded-xl py-3 px-4 flex-row items-center justify-center"
                   onPress={() => {
                     saveItemToDatabase()
@@ -521,7 +525,10 @@ export default function Scan() {
       </Modal>
 
       {isLoading && (
-        <View style={[styles.modalBackground, { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }]} className="flex-1 justify-center items-center">
+        <View
+          style={[styles.modalBackground, { position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }]}
+          className="flex-1 justify-center items-center"
+        >
           <View className="bg-white p-6 rounded-xl shadow-lg items-center">
             <Text className="text-lg font-semibold text-gray-800 mb-4">Searching for product...</Text>
             <View className="h-8 w-8 border-4 border-t-green-500 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin" />
